@@ -1,7 +1,9 @@
-name: Test
+name: Test loading
 
 on:
   pull_request:
+  push:
+     branches: [ "main" ]
   merge_group:
   schedule:
   - cron:  0 23 * * *
