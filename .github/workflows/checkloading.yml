@@ -22,7 +22,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: antontroshin/setup-go@windows-go-mod-cache
+    - uses: lmvysakh/setup-go@test_515
+    # - uses: antontroshin/setup-go@windows-go-mod-cache
       with:
         go-version: ${{ env.GO_VERSION }}
 
