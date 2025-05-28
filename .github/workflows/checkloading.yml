@@ -29,6 +29,24 @@ jobs:
       run: |
         echo "Cleaning Go toolchain cache directory to avoid 'File exists' errors"
         rm -rf $HOME/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.*
+
+    - name: Restore Go modules and build cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+          # Windows paths
+          ~\AppData\Local\go-build
+          ~\go\pkg\mod
+          # macOS paths
+          ~/Library/Caches/go-build
+        key: setup-go-${{ runner.os }}-${{ matrix.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          setup-go-${{ runner.os }}-${{ matrix.os }}-go-${{ env.GO_VERSION }}-
+          setup-go-${{ runner.os }}-${{ matrix.os }}-
+          setup-go-
+          
     - uses: lmvysakh/setup-go@test_515
       with:
         go-version: ${{ env.GO_VERSION }}
