@@ -1,8 +1,3 @@
-
-
-
-
-
 name: Loading check
 on:
   pull_request:
@@ -16,37 +11,20 @@ env:
   GO_VERSION: '1.22'
 jobs:
   build:
-    name: building defsec
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
-    - uses: actions/checkout@v4
-    # Cleanup conflicting Go toolchain cache files on macos and ubuntu to prevent tar extraction errors
-    - name: Clean Go toolchain cache directory (macos & ubuntu)
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
-      run: |
-        echo "Cleaning Go toolchain cache directory to avoid 'File exists' errors"
-        rm -rf $HOME/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.*
+    - name: Setup tar default options
+      shell: bash
+      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
-    - name: Restore Go modules and build cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-          # Windows paths
-          ~\AppData\Local\go-build
-          ~\go\pkg\mod
-          # macOS paths
-          ~/Library/Caches/go-build
-        key: setup-go-${{ runner.os }}-${{ matrix.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          setup-go-${{ runner.os }}-${{ matrix.os }}-go-${{ env.GO_VERSION }}-
-          setup-go-${{ runner.os }}-${{ matrix.os }}-
-          setup-go-
-          
+    - name: building defsec
+      run: echo "Building defsec..."
+
+    - uses: actions/checkout@v4
+
     - uses: lmvysakh/setup-go@test_515
       with:
         go-version: ${{ env.GO_VERSION }}
@@ -66,65 +44,3 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: make test
       shell: bash
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Old workflow
-# name: Loading check
-# on:
-#   pull_request:
-#   workflow_dispatch:
-#   push:
-#      branches: [ "main" ]
-#   merge_group:
-#   schedule:
-#   - cron:  0 23 * * *
-
-# env:
-#   GO_VERSION: '1.22'
-
-# jobs:
-#   build:
-#     name: building defsec
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       matrix:
-#         os: [ macos-latest, windows-latest, ubuntu-latest ]
-
-#     steps:
-#     - uses: actions/checkout@v4
-
-#     - uses: lmvysakh/setup-go@test_515_2
-#     # - uses: antontroshin/setup-go@windows-go-mod-cache
-#       with:
-#         go-version: ${{ env.GO_VERSION }}
-
-#     - name: go mod tidy
-#       if: matrix.os == 'ubuntu-latest'
-#       run: |
-#         go mod tidy
-#         if [ -n "$(git status --porcelain)" ]; then
-#           echo "Run 'go mod tidy' and push it"
-#           exit 1
-#         fi
-#     - name: Run non-localstack tests
-#       if: matrix.os != 'ubuntu-latest'
-#       run: make test-no-localstack
-#       shell: bash
-#     - name: Run full tests
-#       if: matrix.os == 'ubuntu-latest'
-#       run: make test
-#       shell: bash
