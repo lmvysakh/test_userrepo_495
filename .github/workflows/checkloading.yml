@@ -16,13 +16,9 @@ jobs:
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
-    # - name: Setup tar default options
-    #   shell: bash
-    #   run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
-
-    - name: Configure env for toolchain ignore
+    - name: Setup tar default options
       shell: bash
-      run: echo "GOTOOLCHAIN=local" >> "$GITHUB_ENV"
+      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
     - name: building defsec
       run: echo "Building defsec..."
