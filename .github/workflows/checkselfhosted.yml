@@ -11,18 +11,10 @@ env:
   GO_VERSION: '1.22'
 jobs:
   build:
-    # Use self-hosted runners with custom labels for each OS
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # Map your OS names to your self-hosted runner labels
-        include:
-          - os: macos-latest
-            runner: [self-hosted, macos]
-          - os: windows-latest
-            runner: [self-hosted, windows]
-          - os: ubuntu-latest
-            runner: [self-hosted, linux]
+        os: [ self-hosted ]
     steps:
     - name: Setup tar default options
       shell: bash
