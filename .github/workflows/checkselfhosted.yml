@@ -1,0 +1,57 @@
+name: Loading check self hosted
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  merge_group:
+  schedule:
+    - cron: 0 23 * * *
+env:
+  GO_VERSION: '1.22'
+jobs:
+  build:
+    # Use self-hosted runners with custom labels for each OS
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        # Map your OS names to your self-hosted runner labels
+        include:
+          - os: macos-latest
+            runner: [self-hosted, macos]
+          - os: windows-latest
+            runner: [self-hosted, windows]
+          - os: ubuntu-latest
+            runner: [self-hosted, linux]
+    steps:
+    - name: Setup tar default options
+      shell: bash
+      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
+
+    - name: building defsec
+      run: echo "Building defsec..."
+
+    - uses: actions/checkout@v4
+
+    - uses: lmvysakh/setup-go@test_515
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: go mod tidy
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        go mod tidy
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Run 'go mod tidy' and push it"
+          exit 1
+        fi
+
+    - name: Run non-localstack tests
+      if: matrix.os != 'ubuntu-latest'
+      run: make test-no-localstack
+      shell: bash
+
+    - name: Run full tests
+      if: matrix.os == 'ubuntu-latest'
+      run: make test
+      shell: bash
