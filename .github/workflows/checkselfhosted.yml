@@ -17,7 +17,7 @@ jobs:
         os: [ self-hosted ]
     steps:
     - name: Setup tar default options
-      shell: pwsh
+      shell: powershell
       run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     - name: building defsec
