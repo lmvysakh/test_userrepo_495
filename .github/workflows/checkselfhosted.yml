@@ -16,15 +16,6 @@ jobs:
       matrix:
         os: [ self-hosted ]
     steps:
-      - name: Install Go
-        run: |
-          curl -OL https://golang.org/dl/go1.22.0.windows-amd64.zip
-          unzip go1.22.0.windows-amd64.zip -d C:\Go
-          setx PATH "C:\Go\bin;%PATH%"
-      - name: Verify Go Installation
-        run: go version
-      - name: Your Build Step
-        run: go build ./...
       # - name: Setup tar default options
       #   shell: powershell
       #   run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
