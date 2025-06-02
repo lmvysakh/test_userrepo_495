@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Setup tar default options
       shell: powershell
-      run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Append
+      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
     - name: building defsec
       run: echo "Building defsec..."
