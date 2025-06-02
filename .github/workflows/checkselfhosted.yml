@@ -1,4 +1,4 @@
-name: Loading check self hosted
+name: Loading check self hosted windows
 on:
   pull_request:
   workflow_dispatch:
@@ -17,8 +17,8 @@ jobs:
         os: [ self-hosted ]
     steps:
     - name: Setup tar default options
-      shell: bash
-      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
+      shell: pwsh
+      run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     - name: building defsec
       run: echo "Building defsec..."
