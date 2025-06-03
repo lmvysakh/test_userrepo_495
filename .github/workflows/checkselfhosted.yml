@@ -9,13 +9,14 @@ on:
     - cron: '0 23 * * *'
 env:
   GO_VERSION: '1.22'
-  PATH: /usr/local/go/bin:${{ env.PATH }}
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [self-hosted]
+    env:
+      PATH: /usr/local/go/bin:${{ env.PATH }}
     steps:
       # - name: Setup tar default options (Linux/macOS only)
       #   if: matrix.os != 'windows-latest'
