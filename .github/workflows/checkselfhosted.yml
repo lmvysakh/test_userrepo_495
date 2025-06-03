@@ -1,4 +1,4 @@
-name: Loading check
+name: Loading check for windows self hosted
 on:
   pull_request:
   workflow_dispatch:
