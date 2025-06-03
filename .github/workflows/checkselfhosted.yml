@@ -1,4 +1,4 @@
-name: Loading check self hosted windows
+name: Loading check
 on:
   pull_request:
   workflow_dispatch:
@@ -14,36 +14,60 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ self-hosted ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
     steps:
-      # - name: Setup tar default options
-      #   shell: powershell
-      #   run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
+    - name: Setup tar default options (Linux/macOS only)
+      if: matrix.os != 'windows-latest'
+      shell: bash
+      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
-      - name: building defsec
-        run: echo "Building defsec..."
+    - name: Setup tar default options (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - uses: actions/checkout@v4
+    - name: Building defsec
+      run: echo "Building defsec..."
 
-      - uses: lmvysakh/setup-go@test_515
-        with:
-          go-version: ${{ env.GO_VERSION }}
+    - uses: actions/checkout@v4
 
-      - name: go mod tidy
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          go mod tidy
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Run 'go mod tidy' and push it"
-            exit 1
-          fi
+    - name: Setup Go
+      uses: lmvysakh/setup-go@test_515
+      with:
+        go-version: ${{ env.GO_VERSION }}
 
-      - name: Run non-localstack tests
-        if: matrix.os != 'ubuntu-latest'
-        run: make test-no-localstack
-        shell: bash
+    - name: go mod tidy (Ubuntu only)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        go mod tidy
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Run 'go mod tidy' and push it"
+          exit 1
+        fi
 
-      - name: Run full tests
-        if: matrix.os == 'ubuntu-latest'
-        run: make test
-        shell: bash
+    - name: go mod tidy (Windows only)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        go mod tidy
+        $status = git status --porcelain
+        if ($status) {
+          Write-Host "Run 'go mod tidy' and push it"
+          exit 1
+        }
+
+    - name: Run non-localstack tests (Linux/macOS only)
+      if: matrix.os != 'ubuntu-latest' && matrix.os != 'windows-latest'
+      run: make test-no-localstack
+      shell: bash
+
+    - name: Run non-localstack tests (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        make test-no-localstack
+
+    - name: Run full tests (Ubuntu only)
+      if: matrix.os == 'ubuntu-latest'
+      run: make test
+      shell: bash
