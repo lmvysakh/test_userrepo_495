@@ -15,9 +15,10 @@ jobs:
     strategy:
       matrix:
         os: [self-hosted]
-    env:
-      PATH: /usr/local/go/bin:${{ env.PATH }}
     steps:
+      - name: Add /usr/local/go/bin to PATH
+        run: echo "/usr/local/go/bin" >> $GITHUB_PATH
+
       # - name: Setup tar default options (Linux/macOS only)
       #   if: matrix.os != 'windows-latest'
       #   shell: bash
