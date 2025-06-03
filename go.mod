@@ -1,6 +1,6 @@
 module github.com/aquasecurity/trivy-aws
 
-go 1.24
+go 1.22
 
 require (
 	github.com/aquasecurity/go-mock-aws v0.0.0-20240523055201-a4152219967f
