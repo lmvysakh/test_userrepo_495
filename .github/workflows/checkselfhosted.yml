@@ -16,15 +16,15 @@ jobs:
       matrix:
         os: [ self-hosted ]
     steps:
-    - name: Setup tar default options (Linux/macOS only)
-      if: matrix.os != 'windows-latest'
-      shell: bash
-      run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
+    # - name: Setup tar default options (Linux/macOS only)
+    #   if: matrix.os != 'windows-latest'
+    #   shell: bash
+    #   run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
-    - name: Setup tar default options (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: pwsh
-      run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+    # - name: Setup tar default options (Windows)
+    #   if: matrix.os == 'windows-latest'
+    #   shell: pwsh
+    #   run: echo "TAR_OPTIONS=--skip-old-files" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Building defsec
       run: echo "Building defsec..."
