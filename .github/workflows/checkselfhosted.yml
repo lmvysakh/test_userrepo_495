@@ -22,7 +22,7 @@ jobs:
 
       - name: Ensure D drive is available (Windows only)
         if: runner.os == 'Windows'
-        shell: pwsh
+        shell: powershell
         run: |
           if (-not (Test-Path 'D:\')) {
             Write-Host "D: drive not found. Creating virtual drive as D:."
