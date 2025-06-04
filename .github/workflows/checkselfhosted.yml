@@ -24,7 +24,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          $drivePath = "$env:TEMP\virtual-d-drive"
+          $drivePath = Join-Path $env:TEMP "virtual-d-drive"
           if (-not (Test-Path 'D:\')) {
             Write-Host "D: drive not found. Creating virtual drive as D:."
             if (-not (Test-Path $drivePath)) {
@@ -32,6 +32,9 @@ jobs:
             }
             Try {
               subst D: $drivePath
+              if (-not (Test-Path 'D:\')) {
+                Throw "Failed to create the virtual D: drive. Check subst command."
+              }
               Write-Host "Created virtual D: drive at $drivePath"
             } Catch {
               Write-Error "Failed to create virtual D: drive. Error: $_"
