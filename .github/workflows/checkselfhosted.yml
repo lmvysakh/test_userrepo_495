@@ -1,4 +1,5 @@
 name: Loading check self hosted windows
+
 on:
   pull_request:
   workflow_dispatch:
@@ -6,9 +7,11 @@ on:
     branches: [ "main" ]
   merge_group:
   schedule:
-    - cron: 0 23 * * *
+    - cron: '0 23 * * *'
+
 env:
   GO_VERSION: '1.22'
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -16,7 +19,6 @@ jobs:
       matrix:
         os: [ self-hosted ]
     steps:
-
       - name: building defsec
         run: echo "Building defsec..."
 
@@ -25,24 +27,29 @@ jobs:
         shell: powershell
         run: |
           $drivePath = Join-Path $env:TEMP "virtual-d-drive"
+
           if (-not (Test-Path 'D:\')) {
-            Write-Host "D: drive not found. Creating virtual drive as D:."
-            if (-not (Test-Path $drivePath)) {
-              New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
-            }
-            Try {
-              subst D: $drivePath
-              Start-Sleep -Seconds 2 # Add a delay to ensure the drive is created.
-              if (-not (Test-Path 'D:\')) {
-                Throw "Failed to create the virtual D: drive. Check subst command."
+              Write-Host "D: drive not found. Attempting to create a virtual drive as D:."
+              if (-not (Test-Path $drivePath)) {
+                  Write-Host "Creating directory for virtual drive at $drivePath"
+                  New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
               }
-              Write-Host "Created virtual D: drive at $drivePath"
-            } Catch {
-              Write-Error "Failed to create virtual D: drive. Error: $_"
-              Exit 1
-            }
+              Try {
+                  Write-Host "Mapping $drivePath to D: drive using 'subst'."
+                  subst D: $drivePath
+                  Start-Sleep -Seconds 2 # Add a delay to ensure the drive is created.
+
+                  if (-not (Test-Path 'D:\')) {
+                      Throw "Failed to create the virtual D: drive. Verify the 'subst' command and permissions."
+                  }
+                  Write-Host "Successfully created virtual D: drive at $drivePath."
+              } Catch {
+                  Write-Error "Failed to create virtual D: drive. Error: $_"
+                  Write-Host "Debug Info: Drive Path = $drivePath"
+                  Exit 1
+              }
           } else {
-            Write-Host "D: drive already exists."
+              Write-Host "D: drive already exists."
           }
 
       - uses: actions/checkout@v4
@@ -59,6 +66,7 @@ jobs:
             echo "Run 'go mod tidy' and push it"
             exit 1
           fi
+
       - name: Run non-localstack tests
         if: matrix.os != 'ubuntu-latest'
         run: make test-no-localstack
