@@ -32,6 +32,7 @@ jobs:
             }
             Try {
               subst D: $drivePath
+              Start-Sleep -Seconds 2 # Add a delay to ensure the drive is created.
               if (-not (Test-Path 'D:\')) {
                 Throw "Failed to create the virtual D: drive. Check subst command."
               }
