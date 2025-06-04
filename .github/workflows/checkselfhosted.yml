@@ -24,12 +24,19 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
+          $drivePath = "$env:TEMP\virtual-d-drive"
           if (-not (Test-Path 'D:\')) {
             Write-Host "D: drive not found. Creating virtual drive as D:."
-            $drivePath = "$env:TEMP\virtual-d-drive"
-            New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
-            subst D: $drivePath
-            Write-Host "Created virtual D: drive at $drivePath"
+            if (-not (Test-Path $drivePath)) {
+              New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
+            }
+            Try {
+              subst D: $drivePath
+              Write-Host "Created virtual D: drive at $drivePath"
+            } Catch {
+              Write-Error "Failed to create virtual D: drive. Error: $_"
+              Exit 1
+            }
           } else {
             Write-Host "D: drive already exists."
           }
