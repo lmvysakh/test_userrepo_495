@@ -27,7 +27,11 @@ jobs:
         shell: powershell
         run: |
           $drivePath = Join-Path $env:TEMP "virtual-d-drive"
-
+      
+          # Debug: Log the TEMP and drivePath values
+          Write-Host "TEMP directory: $env:TEMP"
+          Write-Host "Drive Path: $drivePath"
+      
           if (-not (Test-Path 'D:\')) {
               Write-Host "D: drive not found. Attempting to create a virtual drive as D:."
               if (-not (Test-Path $drivePath)) {
@@ -38,7 +42,7 @@ jobs:
                   Write-Host "Mapping $drivePath to D: drive using 'subst'."
                   subst D: $drivePath
                   Start-Sleep -Seconds 2 # Add a delay to ensure the drive is created.
-
+      
                   if (-not (Test-Path 'D:\')) {
                       Throw "Failed to create the virtual D: drive. Verify the 'subst' command and permissions."
                   }
