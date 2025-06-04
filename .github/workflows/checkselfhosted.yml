@@ -20,6 +20,20 @@ jobs:
       - name: building defsec
         run: echo "Building defsec..."
 
+      - name: Ensure D drive is available (Windows only)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'D:\')) {
+            Write-Host "D: drive not found. Creating virtual drive as D:."
+            $drivePath = "$env:TEMP\virtual-d-drive"
+            New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
+            subst D: $drivePath
+            Write-Host "Created virtual D: drive at $drivePath"
+          } else {
+            Write-Host "D: drive already exists."
+          }
+
       - uses: actions/checkout@v4
 
       - uses: antontroshin/setup-go@windows-go-mod-cache
