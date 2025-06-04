@@ -27,22 +27,42 @@ jobs:
         shell: powershell
         run: |
           $drivePath = Join-Path $env:TEMP "virtual-d-drive"
-      
-          # Debug: Log the TEMP and drivePath values
+
+          # Debug: Log TEMP and drivePath values
           Write-Host "TEMP directory: $env:TEMP"
           Write-Host "Drive Path: $drivePath"
-      
+
+          # Ensure directory exists
+          if (-not (Test-Path $drivePath)) {
+              Write-Host "Creating directory for virtual drive at $drivePath"
+              New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
+          }
+
+          # Debug: Ensure directory creation was successful
+          if (-not (Test-Path $drivePath)) {
+              Write-Error "Failed to create directory at $drivePath"
+              Exit 1
+          } else {
+              Write-Host "Directory $drivePath exists."
+          }
+
+          # Optional: Output directory permissions for debugging
+          Try {
+              $acl = Get-Acl $drivePath
+              Write-Host "Permissions for $drivePath:"
+              Write-Host $acl
+          } Catch {
+              Write-Host "Could not get ACL for $drivePath"
+          }
+
+          # Map the D: drive if not already present
           if (-not (Test-Path 'D:\')) {
               Write-Host "D: drive not found. Attempting to create a virtual drive as D:."
-              if (-not (Test-Path $drivePath)) {
-                  Write-Host "Creating directory for virtual drive at $drivePath"
-                  New-Item -ItemType Directory -Force -Path $drivePath | Out-Null
-              }
               Try {
                   Write-Host "Mapping $drivePath to D: drive using 'subst'."
                   subst D: $drivePath
                   Start-Sleep -Seconds 2 # Add a delay to ensure the drive is created.
-      
+
                   if (-not (Test-Path 'D:\')) {
                       Throw "Failed to create the virtual D: drive. Verify the 'subst' command and permissions."
                   }
