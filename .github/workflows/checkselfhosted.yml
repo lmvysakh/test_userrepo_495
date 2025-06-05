@@ -40,7 +40,7 @@ jobs:
       - name: Run non-localstack tests
         if: matrix.os != 'ubuntu-latest'
         run: make test-no-localstack
-        shell: bash
+        shell: sh
 
       - name: Run full tests
         if: matrix.os == 'ubuntu-latest'
