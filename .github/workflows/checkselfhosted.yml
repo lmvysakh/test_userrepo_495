@@ -38,7 +38,13 @@ jobs:
           fi
 
       - name: Install sh shell
-        run: sudo apt-get install -y dash
+        run: |
+            if ! command -v sudo &> /dev/null; then
+              echo "sudo not found, running apt-get directly..."
+              apt-get install -y dash
+            else
+              sudo apt-get install -y dash
+            fi  
 
       - name: Run non-localstack tests
         if: matrix.os != 'ubuntu-latest'
