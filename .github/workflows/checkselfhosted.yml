@@ -37,6 +37,9 @@ jobs:
             exit 1
           fi
 
+      - name: Install sh shell
+        run: sudo apt-get install -y dash
+
       - name: Run non-localstack tests
         if: matrix.os != 'ubuntu-latest'
         run: make test-no-localstack
