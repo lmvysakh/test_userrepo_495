@@ -1,0 +1,38 @@
+name: Check failed test
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  merge_group:
+  schedule:
+    - cron: '0 23 * * *'
+
+env:
+  GO_VERSION: '1.22'
+
+jobs:
+  aliases-arch:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        version: [oldstable]
+        architecture: [x32]
+        exclude:
+          - os: macos-latest
+            architecture: x32
+          - os: macos-13
+            architecture: x32
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.version }} ${{ matrix.architecture }}
+        uses: antontroshin/setup-go@windows-go-mod-cache
+        with:
+          go-version: ${{ matrix.version }}
+          architecture: ${{ matrix.architecture }}
+      - name: Verify Go
+        run: go version
