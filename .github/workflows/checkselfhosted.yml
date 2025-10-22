@@ -23,6 +23,12 @@ jobs:
 
       - uses: actions/checkout@v5
 
+      - name: Clean Go cache (may need admin rights)
+        run: |
+          Remove-Item -Recurse -Force "C:\Users\Vysakh\go\pkg\mod"
+          Remove-Item -Recurse -Force "C:\Users\Vysakh\AppData\Local\go-build"
+        shell: powershell
+
       - name: Create Go build cache directory (only if not exists)
         run: |
           if (!(Test-Path -Path "C:\Users\Vysakh\AppData\Local\go-build")) {
