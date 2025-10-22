@@ -28,7 +28,7 @@ jobs:
           if (!(Test-Path -Path "C:\Users\Vysakh\AppData\Local\go-build")) {
             mkdir "C:\Users\Vysakh\AppData\Local\go-build"
           }
-        shell: pwsh
+        shell: powershell
 
       - uses: actions/setup-go@v6
       # - uses: lmvysakh/setup-go@windows_runner_cache_load_fix
