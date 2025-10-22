@@ -37,7 +37,8 @@ jobs:
         shell: powershell
 
       # - uses: actions/setup-go@v6
-      - uses: lmvysakh/setup-go@windows_runner_cache_load_fix
+      - uses: lmvysakh/setup-go@dummyfix_ddrive
+      # - uses: lmvysakh/setup-go@windows_runner_cache_load_fix
         with:
           go-version: ${{ env.GO_VERSION }}
-    
+     
