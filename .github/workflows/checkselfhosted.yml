@@ -6,8 +6,6 @@ on:
   push:
     branches: [ "main" ]
   merge_group:
-  # schedule:
-  #   - cron: '0 23 * * *'
 
 env:
   GO_VERSION: '1.22'
@@ -32,3 +30,21 @@ jobs:
       - name: Display Go version
         run: go version
     
+      - name: go mod tidy
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          go mod tidy
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Run 'go mod tidy' and push it"
+            exit 1
+          fi
+
+      - name: Run non-localstack tests
+        if: matrix.os != 'ubuntu-latest'
+        run: make test-no-localstack
+        shell: sh
+
+      - name: Run full tests
+        if: matrix.os == 'ubuntu-latest'
+        run: make test
+        shell: bash
