@@ -17,16 +17,13 @@ jobs:
       matrix:
         os: [ self-hosted ]
     steps:
-      - name: Setup tar default options
-        shell: bash
-        run: echo "TAR_OPTIONS=--skip-old-files" >> $GITHUB_ENV
 
       - name: building defsec
         run: echo "Building defsec..."
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
       # - uses: lmvysakh/setup-go@windows_runner_cache_load_fix
         with:
           go-version: ${{ env.GO_VERSION }}
