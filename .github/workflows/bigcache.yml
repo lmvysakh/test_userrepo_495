@@ -1,0 +1,82 @@
+name: Big Cache Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  big-cache-windows:
+    name: Big Cache Test (Windows)
+    runs-on: [self-hosted] # For self-hosted; use 'windows-latest' for hosted
+    steps:
+      - uses: actions/checkout@v5
+
+      # Generate big cache directory
+      - name: Generate 1780MB of files (Windows)
+        run: |
+          $sizeMB = 1780
+          $folder = "${{ github.workspace }}\bigcache"
+          New-Item -ItemType Directory -Force -Path $folder
+          for ($i=0; $i -lt $sizeMB; $i++) {
+            $file = "$folder\file$i.bin"
+            $bytes = New-Object byte[] (1024*1024)
+            (New-Object Random).NextBytes($bytes)
+            [System.IO.File]::WriteAllBytes($file, $bytes)
+          }
+        shell: pwsh
+
+      - name: Cache bigcache
+        uses: actions/cache@v4
+        with:
+          path: bigcache
+          key: bigcache-windows-${{ github.run_id }}
+
+      - name: Measure size
+        run: |
+          $folder = "${{ github.workspace }}\bigcache"
+          $size = (Get-ChildItem -Path $folder -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+          Write-Host "Cache folder size: $size MB"
+        shell: pwsh
+
+  big-cache-ubuntu:
+    name: Big Cache Test (Ubuntu)
+    runs-on: [ubuntu-latest] # For self-hosted; use 'ubuntu-latest' for hosted
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Generate 1780MB of files (Linux)
+        run: |
+          mkdir -p bigcache
+          for i in $(seq 1 1780); do
+            dd if=/dev/urandom of=bigcache/file$i.bin bs=1M count=1
+          done
+
+      - name: Cache bigcache
+        uses: actions/cache@v4
+        with:
+          path: bigcache
+          key: bigcache-ubuntu-${{ github.run_id }}
+
+      - name: Measure size
+        run: du -sh bigcache
+
+  big-cache-macos:
+    name: Big Cache Test (macOS)
+    runs-on: [macos-latest] # For self-hosted; use 'macos-latest' for hosted
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Generate 1780MB of files (macOS)
+        run: |
+          mkdir -p bigcache
+          for i in $(seq 1 1780); do
+            dd if=/dev/urandom of=bigcache/file$i.bin bs=1m count=1
+          done
+
+      - name: Cache bigcache
+        uses: actions/cache@v4
+        with:
+          path: bigcache
+          key: bigcache-macos-${{ github.run_id }}
+
+      - name: Measure size
+        run: du -sh bigcache
