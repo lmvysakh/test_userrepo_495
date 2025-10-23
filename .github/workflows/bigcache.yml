@@ -39,7 +39,7 @@ jobs:
 
   big-cache-windows:
     name: Big Cache Test (Windows)
-    runs-on: [windows-lates] # For self-hosted; use 'windows-latest' for hosted
+    runs-on: [windows-latest] # For self-hosted; use 'windows-latest' for hosted
     steps:
       - uses: actions/checkout@v5
 
