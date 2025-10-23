@@ -25,14 +25,14 @@ jobs:
 
       - name: Clean Go cache (may need admin rights)
         run: |
-          if (Test-Path "C:\Users\Vysakh\go\pkg\mod") { Remove-Item -Recurse -Force "C:\Users\Vysakh\go\pkg\mod" }
-          if (Test-Path "C:\Users\Vysakh\AppData\Local\go-build") { Remove-Item -Recurse -Force "C:\Users\Vysakh\AppData\Local\go-build" }
+          if (Test-Path "D:\Users\Vysakh\go\pkg\mod") { Remove-Item -Recurse -Force "D:\Users\Vysakh\go\pkg\mod" }
+          if (Test-Path "D:\Users\Vysakh\AppData\Local\go-build") { Remove-Item -Recurse -Force "D:\Users\Vysakh\AppData\Local\go-build" }
         shell: powershell
 
       - name: Create Go build cache directory (only if not exists)
         run: |
-          if (!(Test-Path -Path "C:\Users\Vysakh\AppData\Local\go-build")) {
-            mkdir "C:\Users\Vysakh\AppData\Local\go-build"
+          if (!(Test-Path -Path "D:\Users\Vysakh\AppData\Local\go-build")) {
+            mkdir "D:\Users\Vysakh\AppData\Local\go-build"
           }
         shell: powershell
 
