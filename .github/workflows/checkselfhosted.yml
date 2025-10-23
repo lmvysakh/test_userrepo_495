@@ -6,7 +6,7 @@ on:
   push:
     branches: [ "main" ]
   merge_group:
-
+ 
 env:
   GO_VERSION: '1.22'
 
