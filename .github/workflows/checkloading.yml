@@ -2,8 +2,8 @@ name: Loading check
 on:
   # pull_request:
   workflow_dispatch:
-  # push:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   # merge_group:
   # schedule:
   #   - cron: 0 23 * * *
@@ -23,11 +23,10 @@ jobs:
     - name: building defsec
       run: echo "Building defsec..."
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
 
-    # - uses: actions/setup-go@v5
-    - uses: lmvysakh/setup-go@windows_runner_cache_load_fix
+    - uses: actions/setup-go@v6
       with:
         go-version: ${{ env.GO_VERSION }}
    
