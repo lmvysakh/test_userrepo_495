@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  big-cache-windows:
-    name: Big Cache Test (Windows)
+  big-cache-self-hosted:
+    name: Big Cache Test (selfhosted Windows)
     runs-on: [self-hosted] # For self-hosted; use 'windows-latest' for hosted
     steps:
       - uses: actions/checkout@v5
@@ -22,7 +22,7 @@ jobs:
             (New-Object Random).NextBytes($bytes)
             [System.IO.File]::WriteAllBytes($file, $bytes)
           }
-        shell: pwsh
+        shell: powershell
 
       - name: Cache bigcache
         uses: actions/cache@v4
@@ -35,7 +35,40 @@ jobs:
           $folder = "${{ github.workspace }}\bigcache"
           $size = (Get-ChildItem -Path $folder -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
           Write-Host "Cache folder size: $size MB"
-        shell: pwsh
+        shell: powershell
+
+  big-cache-windows:
+    name: Big Cache Test (Windows)
+    runs-on: [windows-lates] # For self-hosted; use 'windows-latest' for hosted
+    steps:
+      - uses: actions/checkout@v5
+
+      # Generate big cache directory
+      - name: Generate 1780MB of files (Windows)
+        run: |
+          $sizeMB = 1780
+          $folder = "${{ github.workspace }}\bigcache"
+          New-Item -ItemType Directory -Force -Path $folder
+          for ($i=0; $i -lt $sizeMB; $i++) {
+            $file = "$folder\file$i.bin"
+            $bytes = New-Object byte[] (1024*1024)
+            (New-Object Random).NextBytes($bytes)
+            [System.IO.File]::WriteAllBytes($file, $bytes)
+          }
+        shell: powershell
+
+      - name: Cache bigcache
+        uses: actions/cache@v4
+        with:
+          path: bigcache
+          key: bigcache-windows-${{ github.run_id }}
+
+      - name: Measure size
+        run: |
+          $folder = "${{ github.workspace }}\bigcache"
+          $size = (Get-ChildItem -Path $folder -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+          Write-Host "Cache folder size: $size MB"
+        shell: powershell
 
   big-cache-ubuntu:
     name: Big Cache Test (Ubuntu)
