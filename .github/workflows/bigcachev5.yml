@@ -12,6 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Generate 1780MB of files BEFORE setup-go so cache dependency path exists and is populated
+      - name: Prepare bigcache directory (Windows)
+        run: |
+          $sizeMB = 1780
+          $folder = "${{ github.workspace }}\bigcache"
+          if (!(Test-Path -Path $folder)) {
+            New-Item -ItemType Directory -Force -Path $folder
+            for ($i=0; $i -lt $sizeMB; $i++) {
+              $file = "$folder\file$i.bin"
+              $bytes = New-Object byte[] (1024*1024)
+              (New-Object Random).NextBytes($bytes)
+              [System.IO.File]::WriteAllBytes($file, $bytes)
+            }
+          }
+        shell: powershell
+
       - name: Setup Go with cache
         uses: actions/setup-go@v5
         id: setup-go
@@ -20,11 +36,13 @@ jobs:
           cache: true
           cache-dependency-path: ./bigcache
 
-      - name: Generate 1780MB of files (Windows) if cache miss
+      # Optionally clean and re-generate files if cache wasn't restored (shouldn't be needed except on first run)
+      - name: Re-populate bigcache if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
         run: |
           $sizeMB = 1780
           $folder = "${{ github.workspace }}\bigcache"
+          Remove-Item -Path $folder -Recurse -Force
           New-Item -ItemType Directory -Force -Path $folder
           for ($i=0; $i -lt $sizeMB; $i++) {
             $file = "$folder\file$i.bin"
@@ -47,6 +65,21 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Prepare bigcache directory (Windows)
+        run: |
+          $sizeMB = 1780
+          $folder = "${{ github.workspace }}\bigcache"
+          if (!(Test-Path -Path $folder)) {
+            New-Item -ItemType Directory -Force -Path $folder
+            for ($i=0; $i -lt $sizeMB; $i++) {
+              $file = "$folder\file$i.bin"
+              $bytes = New-Object byte[] (1024*1024)
+              (New-Object Random).NextBytes($bytes)
+              [System.IO.File]::WriteAllBytes($file, $bytes)
+            }
+          }
+        shell: powershell
+
       - name: Setup Go with cache
         uses: actions/setup-go@v5
         id: setup-go
@@ -55,11 +88,12 @@ jobs:
           cache: true
           cache-dependency-path: ./bigcache
 
-      - name: Generate 1780MB of files (Windows) if cache miss
+      - name: Re-populate bigcache if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
         run: |
           $sizeMB = 1780
           $folder = "${{ github.workspace }}\bigcache"
+          Remove-Item -Path $folder -Recurse -Force
           New-Item -ItemType Directory -Force -Path $folder
           for ($i=0; $i -lt $sizeMB; $i++) {
             $file = "$folder\file$i.bin"
@@ -82,6 +116,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Use head -c (faster than dd in a loop) to write a single big file (1.7GB)
+      - name: Prepare bigcache directory (Linux)
+        run: |
+          mkdir -p bigcache
+          if [ ! -f bigcache/largefile.bin ]; then
+            head -c 1780M /dev/urandom > bigcache/largefile.bin
+          fi
+
       - name: Setup Go with cache
         uses: actions/setup-go@v5
         id: setup-go
@@ -90,13 +132,13 @@ jobs:
           cache: true
           cache-dependency-path: ./bigcache
 
-      - name: Generate 1780MB of files (Linux) if cache miss
+      - name: Re-populate bigcache if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
         run: |
+          rm -rf bigcache
           mkdir -p bigcache
-          for i in $(seq 1 1780); do
-            dd if=/dev/urandom of=bigcache/file$i.bin bs=1M count=1
-          done
+          head -c 1780M /dev/urandom > bigcache/largefile.bin
+
       - name: Measure size
         run: du -sh bigcache
 
@@ -106,6 +148,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Use head -c (faster than dd in a loop) to write a single big file (1.7GB)
+      - name: Prepare bigcache directory (macOS)
+        run: |
+          mkdir -p bigcache
+          if [ ! -f bigcache/largefile.bin ]; then
+            head -c 1780M /dev/urandom > bigcache/largefile.bin
+          fi
+
       - name: Setup Go with cache
         uses: actions/setup-go@v5
         id: setup-go
@@ -114,12 +164,12 @@ jobs:
           cache: true
           cache-dependency-path: ./bigcache
 
-      - name: Generate 1780MB of files (macOS) if cache miss
+      - name: Re-populate bigcache if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
         run: |
+          rm -rf bigcache
           mkdir -p bigcache
-          for i in $(seq 1 1780); do
-            dd if=/dev/urandom of=bigcache/file$i.bin bs=1m count=1
-          done
+          head -c 1780M /dev/urandom > bigcache/largefile.bin
+
       - name: Measure size
         run: du -sh bigcache
