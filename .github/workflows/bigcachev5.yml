@@ -153,7 +153,7 @@ jobs:
         run: |
           mkdir -p bigcache
           if [ ! -f bigcache/largefile.bin ]; then
-            head -c 1780M /dev/urandom > bigcache/largefile.bin
+            head -c 1780000000 /dev/urandom > bigcache/largefile.bin
           fi
 
       - name: Setup Go with cache
@@ -169,7 +169,7 @@ jobs:
         run: |
           rm -rf bigcache
           mkdir -p bigcache
-          head -c 1780M /dev/urandom > bigcache/largefile.bin
+          head -c 1780000000 /dev/urandom > bigcache/largefile.bin
 
       - name: Measure size
         run: du -sh bigcache
