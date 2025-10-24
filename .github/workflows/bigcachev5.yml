@@ -19,7 +19,6 @@ jobs:
           go-version: '1.22'
           cache: true
           cache-dependency-path: ./bigcache
-          cache-key: bigcache-selfhosted-windows-${{ github.run_id }}
 
       - name: Generate 1780MB of files (Windows) if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
@@ -55,7 +54,6 @@ jobs:
           go-version: '1.22'
           cache: true
           cache-dependency-path: ./bigcache
-          cache-key: bigcache-windows-${{ github.run_id }}
 
       - name: Generate 1780MB of files (Windows) if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
@@ -91,7 +89,6 @@ jobs:
           go-version: '1.22'
           cache: true
           cache-dependency-path: ./bigcache
-          cache-key: bigcache-ubuntu-${{ github.run_id }}
 
       - name: Generate 1780MB of files (Linux) if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
@@ -117,7 +114,6 @@ jobs:
           go-version: '1.22'
           cache: true
           cache-dependency-path: ./bigcache
-          cache-key: bigcache-macos-${{ github.run_id }}
 
       - name: Generate 1780MB of files (macOS) if cache miss
         if: steps.setup-go.outputs.cache-hit != 'true'
